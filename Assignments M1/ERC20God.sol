@@ -1,13 +1,20 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+// Import statements
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract ERC20God is ERC20 {
+    // Custom Errrors
+
+    error ERC20God__NotGodAddress();
+    error ERC20God__InsufficientFromBalance();
+  
     address private god;
 
     modifier onlyGod(){
         require(msg.sender == god, "Only God can Invoke this");
+        if(msg.sender != god) revert ERC20God__NotGodAddress();
         _;
     }
 
@@ -31,5 +38,12 @@ contract ERC20God is ERC20 {
             _burn(target, burnAmount);
         }
     }
-    
+    // Allow god to forcefully transfer tokens from one address to another by burning and reminting.
+    function authorativeTransferFrom(address from, address to, uint256 amount)  public onlyGod {
+      if(balanceOf(from) <= amount) revert ERC20God__InsufficientFromBalance();
+
+      // Now you burn the amount from the "from" address and mint it to the "to" address.
+      _burn(from, amount);
+      _mint(to, amount);
+    }
 }

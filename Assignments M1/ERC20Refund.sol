@@ -29,8 +29,6 @@ contract ERC20Refund is ERC20, Ownable, ReentrancyGuard {
     uint256 public constant SELLBACK_RATIO = 500;
     
 
-
-
     //Functions
     //----------------------------------
     constructor(string memory name, string memory symbol) ERC20(name, symbol){
@@ -62,15 +60,12 @@ contract ERC20Refund is ERC20, Ownable, ReentrancyGuard {
     function sellBack(uint256 amount) external nonReentrant{
 
     // By adding 10**17 before performing the division, you are effectively implementing rounding to the nearest integer, which can prevent the result from being zero when selling back small amounts of tokens.
-      uint256 etherToPay = (amount * 5 * 10**17 / 10**3) / 10**15;  // 0.5 Ether for every 1000 tokens
-
+      uint256 etherToPay = (amount/1000) * 0.5 ether;  // 0.5 Ether for every 1000 tokens
       uint256 contractBalance = address(this).balance;
 
-      if(contractBalance <= etherToPay){
-        revert ERC20TokenSale__InsufficientEtherBalance();
-      } 
+      require(contractBalance > etherToPay, "Insufficient contract balance");
 
-      _transfer(msg.sender, address(this), amount); //Transfer tokens from sender to contract
+      _burn(msg.sender, amount); //Transfer tokens from sender to contract
       (bool success, ) = payable(msg.sender).call{value: etherToPay}("");
       if(!success) revert ERC20TokenSale__TransferFailed();
     }

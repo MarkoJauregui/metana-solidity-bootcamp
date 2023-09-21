@@ -13,7 +13,7 @@ contract ERC20God is ERC20 {
     address private god;
 
     modifier onlyGod(){
-        require(msg.sender == god, "Only God can Invoke this");
+        //require(msg.sender == god, "Only God can Invoke this");
         if(msg.sender != god) revert ERC20God__NotGodAddress();
         _;
     }

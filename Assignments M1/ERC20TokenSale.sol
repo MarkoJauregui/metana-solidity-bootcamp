@@ -25,7 +25,7 @@ contract ERC20TokenSale is ERC20, Ownable, ReentrancyGuard {
     //----------------------------------
     constructor(string memory name, string memory symbol) ERC20(name, symbol){
         // you can mint a set amount here if wanted, the folliwing line mints 10 thousand tokens to the contract deployer if uncommented.
-        // _mint(msg.sender, 10000 * 10**18); 
+        _mint(msg.sender, 10000 * 10**18); 
     }
 
 

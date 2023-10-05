@@ -10,8 +10,9 @@ import "@openzeppelin/contracts/access/Ownable.sol";
  */
 contract CirclesERC1155 is ERC1155, Ownable {
     // Custom Errors
-    error CirclesERC1155_CooldownNotElapsed();
-    error CirclesERC1155_InvalidTokenID();
+    error CirclesERC1155__CooldownNotElapsed();
+    error CirclesERC1155__InvalidTokenID();
+    error CirclesERC1155__NotTokenOwner();
 
     // Constants for token IDs
     uint256 public constant TOKEN_ID_0 = 0;
@@ -40,13 +41,13 @@ contract CirclesERC1155 is ERC1155, Ownable {
     function mint(uint256 tokenId, uint256 amount) external {
         // Check token ID
         if (tokenId > TOKEN_ID_2 && msg.sender != s_forgingContract) {
-            revert CirclesERC1155_InvalidTokenID();
+            revert CirclesERC1155__InvalidTokenID();
         }
 
         // If token ID is 0-2, check for cooldown
         if (tokenId <= TOKEN_ID_2) {
             if (block.timestamp - s_lastMintTimestamp[msg.sender][tokenId] < COOLDOWN_TIME) {
-                revert CirclesERC1155_CooldownNotElapsed();
+                revert CirclesERC1155__CooldownNotElapsed();
             }
             s_lastMintTimestamp[msg.sender][tokenId] = block.timestamp;
         }
@@ -63,8 +64,9 @@ contract CirclesERC1155 is ERC1155, Ownable {
      */
     function burn(address account, uint256 tokenId, uint256 amount) external {
         // Check if the caller is the owner of the tokens and if the token ID is valid for burning
-        require(msg.sender == account, "You can only burn tokens you own");
-        require(tokenId >= TOKEN_ID_3 && tokenId <= TOKEN_ID_6, "Invalid token ID for burning");
+        // require(msg.sender == account, "You can only burn tokens you own");
+        if (msg.sender != account) revert CirclesERC1155__NotTokenOwner();
+        if (tokenId < TOKEN_ID_3 || tokenId > TOKEN_ID_6) revert CirclesERC1155__InvalidTokenID();
 
         _burn(account, tokenId, amount);
     }

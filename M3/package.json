@@ -4,6 +4,7 @@
     "@openzeppelin/contracts": "^4.9.3"
   },
   "dependencies": {
-    "ethers": "^6.7.1"
+    "ethers": "^6.7.1",
+    "hardhat": "^2.18.0"
   }
 }

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.7;
 
+// Import Statements
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
@@ -25,9 +26,18 @@ contract CirclesERC1155 is ERC1155, Ownable {
     // Cooldown time for minting tokens 0-2
     uint256 public constant COOLDOWN_TIME = 1 minutes;
 
-    // Storage: Mapping to track the last minting timestamp for each user and each token
+    /**
+     *  @dev Mapping to track the last minting timestamp for each user and each token
+     */
     mapping(address => mapping(uint256 => uint256)) private s_lastMintTimestamp;
 
+    // Events
+    event Minted(address indexed user, uint256 tokenId, uint256 amount);
+    event Burned(address indexed user, uint256 tokenId, uint256 amount);
+
+    //////////////
+    // Functions//
+    // //////////
     /**
      * @dev Constructor that sets the URI for the ERC1155 token metadata.
      */
@@ -54,6 +64,7 @@ contract CirclesERC1155 is ERC1155, Ownable {
 
         // Mint the token
         _mint(msg.sender, tokenId, amount, "");
+        emit Minted(msg.sender, tokenId, amount);
     }
 
     /**
@@ -69,6 +80,7 @@ contract CirclesERC1155 is ERC1155, Ownable {
         if (tokenId < TOKEN_ID_3 || tokenId > TOKEN_ID_6) revert CirclesERC1155__InvalidTokenID();
 
         _burn(account, tokenId, amount);
+        emit Burned(msg.sender, tokenId, amount);
     }
 
     /**

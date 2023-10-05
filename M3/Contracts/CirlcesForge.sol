@@ -12,6 +12,9 @@ contract CirclesForge {
     // Storage: Instance of the ERC1155 contract
     CirclesERC1155 private s_erc1155Contract;
 
+    // Events
+    event TokenForged(address indexed user, uint256 tokenId);
+
     /**
      * @dev Constructor that sets the address of the CirclesERC1155 contract.
      * @param _erc1155Address The address of the CirclesERC1155 contract.
@@ -38,6 +41,8 @@ contract CirclesForge {
 
         // Mint Token 3 to caller account
         s_erc1155Contract.mint(msg.sender, CirclesERC1155.TOKEN_ID_3, 1);
+
+        emit TokenForged(msg.sender, CirclesERC1155.TOKEN_ID_3);
     }
 
     /**
@@ -55,6 +60,8 @@ contract CirclesForge {
         s_erc1155Contract.burn(msg.sender, CirclesERC1155.TOKEN_ID_2, 1);
 
         s_erc1155Contract.mint(msg.sender, CirclesERC1155.TOKEN_ID_4, 1);
+
+        emit TokenForged(msg.sender, CirclesERC1155.TOKEN_ID_4);
     }
 
     /**
@@ -72,6 +79,8 @@ contract CirclesForge {
         s_erc1155Contract.burn(msg.sender, CirclesERC1155.TOKEN_ID_2, 1);
 
         s_erc1155Contract.mint(msg.sender, CirclesERC1155.TOKEN_ID_5, 1);
+
+        emit TokenForged(msg.sender, CirclesERC1155.TOKEN_ID_5);
     }
 
     /**
@@ -96,5 +105,7 @@ contract CirclesForge {
 
         // Mint Token 6 to caller's account
         s_erc1155Contract.mint(msg.sender, CirclesERC1155.TOKEN_ID_6, 1);
+
+        emit TokenForged(msg.sender, CirclesERC1155.TOKEN_ID_6);
     }
 }

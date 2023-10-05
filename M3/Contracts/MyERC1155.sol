@@ -38,7 +38,21 @@ contract CirclesERC1155 is ERC1155, Ownable {
      * @param amount The amount of tokens to mint.
      */
     function mint(uint256 tokenId, uint256 amount) external {
-        // ... function body ...
+        // Check token ID
+        if (tokenId > TOKEN_ID_2 && msg.sender != s_forgingContract) {
+            revert CirclesERC1155_InvalidTokenID();
+        }
+
+        // If token ID is 0-2, check for cooldown
+        if (tokenId <= TOKEN_ID_2) {
+            if (block.timestamp - s_lastMintTimestamp[msg.sender][tokenId] < COOLDOWN_TIME) {
+                revert CirclesERC1155_CooldownNotElapsed();
+            }
+            s_lastMintTimestamp[msg.sender][tokenId] = block.timestamp;
+        }
+
+        // Mint the token
+        _mint(msg.sender, tokenId, amount, "");
     }
 
     /**
@@ -48,7 +62,11 @@ contract CirclesERC1155 is ERC1155, Ownable {
      * @param amount The amount of tokens to burn.
      */
     function burn(address account, uint256 tokenId, uint256 amount) external {
-        // ... function body ...
+        // Check if the caller is the owner of the tokens and if the token ID is valid for burning
+        require(msg.sender == account, "You can only burn tokens you own");
+        require(tokenId >= TOKEN_ID_3 && tokenId <= TOKEN_ID_6, "Invalid token ID for burning");
+
+        _burn(account, tokenId, amount);
     }
 
     /**

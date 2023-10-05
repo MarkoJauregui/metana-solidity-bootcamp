@@ -3,6 +3,11 @@ pragma solidity ^0.8.7;
 
 import "./CirclesERC1155.sol";
 
+/**
+ * @title CirclesForge
+ * @author Marko Jauregui
+ * @notice Forge contract to interact with CirclesERC1155.sol
+ */
 contract CirclesForge {
     // Custom Errors
     error CirclesForge__InsufficientToken0();

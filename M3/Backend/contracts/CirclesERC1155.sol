@@ -31,6 +31,12 @@ contract CirclesERC1155 is ERC1155, AccessControl {
     /// @dev Mapping to track the last minting timestamp for each user and each token
     mapping(address => mapping(uint256 => uint256)) private s_lastMintTimestamp;
 
+    /// @notice Event emitted when tokens are minted
+    event Minted(address indexed user, uint256 tokenId, uint256 amount);
+
+    /// @notice Event emitted when tokens are burned
+    event Burned(address indexed user, uint256 tokenId, uint256 amount);
+
     /**
      * @dev Sets the initial state of the contract.
      * @param uri URI for token metadata

@@ -8,7 +8,9 @@ async function main() {
 
   // Deploy CirclesERC1155 contract
   const CirclesERC1155 = await ethers.getContractFactory("CirclesERC1155");
-  const circlesERC1155 = await CirclesERC1155.deploy();
+  const circlesERC1155 = await CirclesERC1155.deploy(
+    "ipfs://QmdpEYwJircF4qH5imJG4bJT3TH6rNYxzCL2d8B4bG7Uhy/{id}"
+  );
   await circlesERC1155.deployed();
 
   console.log("CirclesERC1155 contract deployed to:", circlesERC1155.address);
@@ -20,8 +22,11 @@ async function main() {
 
   console.log("CirclesForge contract deployed to:", circlesForge.address);
 
-  // Grant minting rights to CirclesForge contract
+  // Set CirclesForge as the forging contract in CirclesERC1155
+  await circlesERC1155.setForgingContract(circlesForge.address);
+  console.log("Set CirclesForge as the forging contract in CirclesERC1155");
 
+  // Grant minting rights to CirclesForge contract
   await circlesERC1155.grantRole(
     circlesERC1155.MINTER_ROLE(),
     circlesForge.address

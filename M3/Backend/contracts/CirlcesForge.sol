@@ -6,7 +6,7 @@ import "./CirclesERC1155.sol";
 /**
  * @title CirclesForge
  * @author Marko Jauregui
- * @notice Forge contract to interact with CirclesERC1155.sol
+ * @notice Forge contract to interact with CirclesERC1155.sol for forging logic.
  */
 contract CirclesForge {
     // Custom Errors
@@ -42,16 +42,18 @@ contract CirclesForge {
     }
 
     /**
-     * @dev Forges Token 3 by burning tokens 0 & 1
-     * @param _amount The amount of tokens you burn in exchange for the same amount of forged tokens
+     * @notice Forges Token 3 by burning tokens 0 & 1.
+     * @param _amount The amount of tokens to be burned in exchange for the same amount of forged tokens.
      */
     function forgeToken3(uint256 _amount) external {
-        if (s_erc1155Contract.balanceOf(msg.sender, TOKEN_ID_0) < _amount) {
-            revert CirclesForge__InsufficientToken0();
-        }
-        if (s_erc1155Contract.balanceOf(msg.sender, TOKEN_ID_1) < _amount) {
-            revert CirclesForge__InsufficientToken1();
-        }
+        require(
+            s_erc1155Contract.balanceOf(msg.sender, TOKEN_ID_0) >= _amount,
+            "CirclesForge__InsufficientToken0"
+        );
+        require(
+            s_erc1155Contract.balanceOf(msg.sender, TOKEN_ID_1) >= _amount,
+            "CirclesForge__InsufficientToken1"
+        );
 
         // Burn the required tokens from the user's balance
         s_erc1155Contract.burn(msg.sender, TOKEN_ID_0, _amount);
@@ -68,12 +70,14 @@ contract CirclesForge {
      * @param _amount The number of tokens to forge.
      */
     function forgeToken4(uint256 _amount) external {
-        if (s_erc1155Contract.balanceOf(msg.sender, TOKEN_ID_1) < _amount) {
-            revert CirclesForge__InsufficientToken1();
-        }
-        if (s_erc1155Contract.balanceOf(msg.sender, TOKEN_ID_2) < _amount) {
-            revert CirclesForge__InsufficientToken2();
-        }
+        require(
+            s_erc1155Contract.balanceOf(msg.sender, TOKEN_ID_1) >= _amount,
+            "CirclesForge__InsufficientToken1"
+        );
+        require(
+            s_erc1155Contract.balanceOf(msg.sender, TOKEN_ID_2) >= _amount,
+            "CirclesForge__InsufficientToken2"
+        );
 
         // Burn the required tokens from the user's balance
         s_erc1155Contract.burn(msg.sender, TOKEN_ID_1, _amount);
@@ -86,16 +90,18 @@ contract CirclesForge {
     }
 
     /**
-     * @notice Forges Token 5 by burning tokens 0 and 2.
+     * @notice Forges Token 5 by burning tokens 0 & 2.
      * @param _amount The number of tokens to forge.
      */
     function forgeToken5(uint256 _amount) external {
-        if (s_erc1155Contract.balanceOf(msg.sender, TOKEN_ID_0) < _amount) {
-            revert CirclesForge__InsufficientToken0();
-        }
-        if (s_erc1155Contract.balanceOf(msg.sender, TOKEN_ID_2) < _amount) {
-            revert CirclesForge__InsufficientToken2();
-        }
+        require(
+            s_erc1155Contract.balanceOf(msg.sender, TOKEN_ID_0) >= _amount,
+            "CirclesForge__InsufficientToken0"
+        );
+        require(
+            s_erc1155Contract.balanceOf(msg.sender, TOKEN_ID_2) >= _amount,
+            "CirclesForge__InsufficientToken2"
+        );
 
         // Burn the required tokens from the user's balance
         s_erc1155Contract.burn(msg.sender, TOKEN_ID_0, _amount);
@@ -108,19 +114,22 @@ contract CirclesForge {
     }
 
     /**
-     * @notice Forges Token 6 by burning tokens 0, 1, and 2.
+     * @notice Forges Token 6 by burning tokens 0, 1, & 2.
      * @param _amount The number of tokens to forge.
      */
     function forgeToken6(uint256 _amount) external {
-        if (s_erc1155Contract.balanceOf(msg.sender, TOKEN_ID_0) < _amount) {
-            revert CirclesForge__InsufficientToken0();
-        }
-        if (s_erc1155Contract.balanceOf(msg.sender, TOKEN_ID_1) < _amount) {
-            revert CirclesForge__InsufficientToken1();
-        }
-        if (s_erc1155Contract.balanceOf(msg.sender, TOKEN_ID_2) < _amount) {
-            revert CirclesForge__InsufficientToken2();
-        }
+        require(
+            s_erc1155Contract.balanceOf(msg.sender, TOKEN_ID_0) >= _amount,
+            "CirclesForge__InsufficientToken0"
+        );
+        require(
+            s_erc1155Contract.balanceOf(msg.sender, TOKEN_ID_1) >= _amount,
+            "CirclesForge__InsufficientToken1"
+        );
+        require(
+            s_erc1155Contract.balanceOf(msg.sender, TOKEN_ID_2) >= _amount,
+            "CirclesForge__InsufficientToken2"
+        );
 
         // Burn the required tokens from the user's balance
         s_erc1155Contract.burn(msg.sender, TOKEN_ID_0, _amount);

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.7;
+pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
@@ -51,25 +51,25 @@ contract CirclesERC1155 is ERC1155, AccessControl {
 
     /**
      * @notice Allows minting of tokens.
-     * @param recipient The address receiving the minted tokens.
+
      * @param tokenId The ID of the token to mint.
      * @param amount The number of tokens to mint.
      */
-    function mint(address recipient, uint256 tokenId, uint256 amount) public {
+    function mint(address account, uint256 tokenId, uint256 amount) public {
         if (tokenId <= TOKEN_ID_2) {
             if (
-                block.timestamp - s_lastMintTimestamp[recipient][tokenId] <
+                block.timestamp - s_lastMintTimestamp[msg.sender][tokenId] <
                 COOLDOWN_TIME
             ) revert CirclesERC1155__CooldownNotElapsed();
 
-            s_lastMintTimestamp[recipient][tokenId] = block.timestamp;
+            s_lastMintTimestamp[msg.sender][tokenId] = block.timestamp;
         } else {
             if (!hasRole(MINTER_ROLE, msg.sender))
                 revert CirclesERC1155__NotAMinter();
         }
 
-        _mint(recipient, tokenId, amount, "");
-        emit Minted(recipient, tokenId, amount);
+        _mint(account, tokenId, amount, "");
+        emit Minted(msg.sender, tokenId, amount);
     }
 
     /**
@@ -94,20 +94,12 @@ contract CirclesERC1155 is ERC1155, AccessControl {
 
     /**
      * @notice Allows burning of tokens.
-     * @param account The owner of the tokens.
      * @param tokenId The ID of the token to burn.
      * @param amount The number of tokens to burn.
      */
     function burn(address account, uint256 tokenId, uint256 amount) public {
-        if (msg.sender != account && msg.sender != s_forgingContract)
-            revert CirclesERC1155__NotTokenOwnerOrForgeContract();
-
-        if (
-            (tokenId < TOKEN_ID_0 || tokenId > TOKEN_ID_2) &&
-            msg.sender != s_forgingContract
-        ) revert CirclesERC1155__InvalidTokenForBurn();
-
         _burn(account, tokenId, amount);
+        emit Burned(account, tokenId, amount);
     }
 
     /**

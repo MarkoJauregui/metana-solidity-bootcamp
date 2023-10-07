@@ -1,12 +1,18 @@
 import React from 'react';
-import './App.css';
+import ConnectWalletButton from './components/Common/ConnectWalletButton';
+import UserInfo from './components/Common/UserInfo';
+import MintTokens from './components/Mint/MintTokens';
+import ForgeTokens from './components/Forge/ForgeTokens';
+import TradeTokens from './components/Trade/TradeTokens';
 
 function App() {
 	return (
 		<div className="App">
-			<header className="App-header">
-				<h1>Circles App</h1>
-			</header>
+			<ConnectWalletButton />
+			<UserInfo />
+			<MintTokens />
+			<ForgeTokens />
+			<TradeTokens />
 		</div>
 	);
 }

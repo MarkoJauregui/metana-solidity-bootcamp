@@ -4,7 +4,7 @@ require("dotenv").config();
 require("@nomiclabs/hardhat-etherscan");
 
 module.exports = {
-  solidity: "0.8.7",
+  solidity: "0.8.20",
   networks: {
     mumbai: {
       url: `https://polygon-mumbai.infura.io/v3/${process.env.INFURA_API_KEY}`,

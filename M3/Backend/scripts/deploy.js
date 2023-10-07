@@ -8,9 +8,7 @@ async function main() {
 
   // Deploy CirclesERC1155 contract
   const CirclesERC1155 = await ethers.getContractFactory("CirclesERC1155");
-  const circlesERC1155 = await CirclesERC1155.deploy(
-    "ipfs://QmdpEYwJircF4qH5imJG4bJT3TH6rNYxzCL2d8B4bG7Uhy/{id}"
-  );
+  const circlesERC1155 = await CirclesERC1155.deploy();
   await circlesERC1155.deployed();
 
   console.log("CirclesERC1155 contract deployed to:", circlesERC1155.address);

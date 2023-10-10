@@ -1,11 +1,14 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
+import ReactDOM from 'react-dom';
 import App from './App';
+import { Web3ProviderComponent } from '../src/contexts/Web3Context';
+import './index.css';
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
+ReactDOM.render(
 	<React.StrictMode>
-		<App />
-	</React.StrictMode>
+		<Web3ProviderComponent>
+			<App />
+		</Web3ProviderComponent>
+	</React.StrictMode>,
+	document.getElementById('root')
 );

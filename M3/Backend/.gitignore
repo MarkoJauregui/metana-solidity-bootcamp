@@ -1,0 +1,19 @@
+# Hardhat cache
+cache/
+
+# Hardhat artifacts (like compiled contracts)
+artifacts/
+
+# Node modules
+node_modules/
+
+# Environment variables
+.env
+
+# IDE folders
+.vscode/
+.idea/
+
+# Operating system files
+.DS_Store
+Thumbs.db

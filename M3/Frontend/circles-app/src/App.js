@@ -18,8 +18,13 @@ function App() {
 			<div className="my-6 p-4 border rounded shadow-md bg-white max-w-lg mx-auto">
 				<Mint />
 			</div>
-			<Forge />
-			<Trade />
+			<div className="my-6 p-4 border rounded shadow-md bg-white max-w-lg mx-auto">
+				<Forge />
+			</div>
+
+			<div className="my-6 p-4 border rounded shadow-md bg-white max-w-lg mx-auto">
+				<Trade />
+			</div>
 		</div>
 	);
 }

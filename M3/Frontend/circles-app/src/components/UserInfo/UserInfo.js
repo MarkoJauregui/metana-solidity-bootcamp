@@ -16,6 +16,8 @@ function UserInfo() {
 	return (
 		<div className="container mx-auto p-4">
 			<div className="mb-4">
+				<h1 className="text-2xl font-semibold mb-4">Check Balance</h1>
+
 				<label
 					className="block text-gray-700 text-sm font-bold mb-2"
 					htmlFor="tokenId"

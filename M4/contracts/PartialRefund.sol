@@ -4,6 +4,7 @@ pragma solidity ^0.8.19;
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "hardhat/console.sol";
 
 /**
  * @title ERC20 Token Sale with Partial Refund capability
@@ -23,13 +24,17 @@ contract PartialRefund is ERC20, Ownable, ReentrancyGuard {
     uint256 public constant TOKENS_PER_ETHER = 1000 * 10 ** 18;
     uint256 public constant ETHER_TO_WEI = 10 ** 18;
     uint256 public constant SELLBACK_RATIO = 500;
+    uint256 public constant DECIMALS = 18;
 
     /**
      * @dev Contract constructor.
      * @param name Name of the ERC20 token.
      * @param symbol Symbol of the ERC20 token.
      */
-    constructor(string memory name, string memory symbol) ERC20(name, symbol) {
+    constructor(
+        string memory name,
+        string memory symbol
+    ) ERC20(name, symbol) Ownable(msg.sender) {
         _mint(msg.sender, 10000 * 10 ** 18);
     }
 
@@ -37,31 +42,46 @@ contract PartialRefund is ERC20, Ownable, ReentrancyGuard {
      * @dev Allows users to mint tokens.
      */
     function mintTokens() public payable nonReentrant {
-        if (totalSupply() >= s_MAX_SUPPLY) revert SaleHasEnded();
-        if (msg.value != s_ETHER_TO_WEI) revert IncorrectMintingPrice();
+        if (totalSupply() >= MAX_SUPPLY) revert PartialRefund__SaleHasEnded();
+        if (msg.value != ETHER_TO_WEI)
+            revert PartialRefund__IncorrectMintingPrice();
 
-        uint256 tokensToMint = s_TOKENS_PER_ETHER;
+        uint256 tokensToMint = TOKENS_PER_ETHER;
 
-        if (totalSupply() + tokensToMint > s_MAX_SUPPLY) {
-            tokensToMint = s_MAX_SUPPLY - totalSupply();
+        if (totalSupply() + tokensToMint >= MAX_SUPPLY) {
+            tokensToMint = MAX_SUPPLY - totalSupply();
         }
 
         _mint(msg.sender, tokensToMint);
     }
+
+    //!!!!!!!
+    // UNCOMMENT THIS FUNCTION FOR TESTING PURPOSES
+    // function adminMint(address to, uint256 amount) external onlyOwner {
+    //     _mint(to, amount);
+    // }
+    ///////////////////////////////////////////////
 
     /**
      * @dev Allows users to sell back their tokens.
      * @param amount Amount of tokens to sell back.
      */
     function sellBack(uint256 amount) external nonReentrant {
-        uint256 etherToPay = (amount / 1000) * 0.5 ether;
+        uint256 etherToPay = (amount * 0.5 ether) /
+            (uint256(10 ** DECIMALS) * 1000);
+
         uint256 contractBalance = address(this).balance;
 
-        if (contractBalance <= etherToPay) revert InsufficientEtherBalance();
+        // Debugging log
+        console.log("etherToPay:", etherToPay);
+        console.log("contractBalance:", contractBalance);
+
+        if (contractBalance < etherToPay)
+            revert PartialRefund__InsufficientEtherBalance();
 
         _burn(msg.sender, amount);
         (bool success, ) = payable(msg.sender).call{value: etherToPay}("");
-        if (!success) revert TransferFailed();
+        if (!success) revert PartialRefund__TransferFailed();
     }
 
     /**
@@ -70,10 +90,24 @@ contract PartialRefund is ERC20, Ownable, ReentrancyGuard {
     function withdraw() external onlyOwner {
         uint256 contractBalance = address(this).balance;
 
-        if (contractBalance == 0) revert NoBalanceToWithdraw();
+        if (contractBalance == 0) revert PartialRefund__NoBalanceToWithdraw();
 
         (bool success, ) = payable(owner()).call{value: contractBalance}("");
-        if (!success) revert TransferFailed();
+        if (!success) revert PartialRefund__TransferFailed();
+    }
+
+    /**
+     * @dev Returns the maximum supply of the token.
+     */
+    function getMaxSupply() external pure returns (uint256) {
+        return MAX_SUPPLY;
+    }
+
+    /**
+     * @dev Returns the number of tokens minted per Ether.
+     */
+    function getTokensPerEther() external pure returns (uint256) {
+        return TOKENS_PER_ETHER;
     }
 
     /**
@@ -81,12 +115,5 @@ contract PartialRefund is ERC20, Ownable, ReentrancyGuard {
      */
     receive() external payable {
         mintTokens();
-    }
-
-    /**
-     * @dev Fallback function that reverts transactions without data to inform users about minting method.
-     */
-    fallback() external payable {
-        revert("Send Ether to the contract's address to mint tokens");
     }
 }

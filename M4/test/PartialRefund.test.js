@@ -75,6 +75,14 @@ describe('PartialRefund', function () {
 					.mintTokens({ value: ethers.utils.parseEther('1') })
 			).to.be.revertedWith('PartialRefund__SaleHasEnded');
 		});
+
+		it('Should not allow minting with more than 1 Ether', async function () {
+			await expect(
+				partialRefund
+					.connect(addr1)
+					.mintTokens({ value: ethers.utils.parseEther('1.5') })
+			).to.be.revertedWith('PartialRefund__IncorrectMintingPrice');
+		});
 	});
 
 	describe('Selling Back Tokens', function () {
@@ -172,6 +180,51 @@ describe('PartialRefund', function () {
 				ethers.utils.parseEther('0.01')
 			); // accounting for gas costs
 		});
+
+		it('Should allow selling back when contract Ether balance is just enough', async function () {
+			// Mint tokens for addr1 (adds 1 Ether to the contract)
+			await partialRefund
+				.connect(addr1)
+				.mintTokens({ value: ethers.utils.parseEther('1') });
+
+			// Sell back the tokens, reducing contract's Ether balance to 0.5
+			await partialRefund
+				.connect(addr1)
+				.sellBack(ethers.utils.parseEther('1000'));
+
+			// Admin mint 1000 tokens to addr2
+			await partialRefund.adminMint(
+				addr2.address,
+				ethers.utils.parseEther('1000')
+			);
+
+			// Now, addr2 sells back the tokens
+			await partialRefund
+				.connect(addr2)
+				.sellBack(ethers.utils.parseEther('1000'));
+
+			// Check final Ether balance of the contract (should be 0 after the sellback)
+			const contractBalance = await ethers.provider.getBalance(
+				partialRefund.address
+			);
+			expect(contractBalance).to.equal(0);
+		});
+	});
+	describe('Withdraw Function', function () {
+		it('Should revert if owner tries to withdraw when contract balance is 0', async function () {
+			// Now, attempt to withdraw again which should fail
+			await expect(partialRefund.connect(owner).withdraw()).to.be.revertedWith(
+				'PartialRefund__NoBalanceToWithdraw'
+			);
+		});
+
+		it('Should revert if NOT owner tries to withdraw', async function () {
+			await partialRefund
+				.connect(addr1)
+				.mintTokens({ value: ethers.utils.parseEther('1') });
+			// Now, attempt to withdraw again which should fail
+			await expect(partialRefund.connect(addr1).withdraw()).to.reverted;
+		});
 	});
 
 	describe('Error Handling', function () {
@@ -197,6 +250,14 @@ describe('PartialRefund', function () {
 			await expect(
 				partialRefund.connect(addr1).mintTokens({ value: '5' })
 			).to.be.revertedWith('PartialRefund__IncorrectMintingPrice');
+		});
+
+		it('Should revert if incorrect minting price is sent', async function () {
+			await expect(
+				partialRefund
+					.connect(addr1)
+					.adminMint(addr1.address, ethers.utils.parseEther('20'))
+			).to.reverted;
 		});
 	});
 

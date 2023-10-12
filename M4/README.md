@@ -1,13 +1,55 @@
-# Sample Hardhat Project
+# M4 Repository
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
+This repository contains Solidity smart contracts, including:
 
-Try running some of the following tasks:
+### CirclesERC1155.sol
 
-```shell
-npx hardhat help
+A custom ERC1155 token implementation.
+
+### CirclesForge.sol
+
+A contract to interact with CirclesERC1155.sol for forging logic.
+
+### PartialRefund.sol
+
+A modified version of the TokenSale contract, where users can mint and sell back tokens.
+
+### Prerequisites
+
+Ensure you have Node.js and npm installed.
+
+### Installation
+
+1. Clone the repository
+
+```bash
+git clone https://github.com/MarkoJauregui/metana-solidity-bootcamp.git
+```
+
+### Navigate to the repository folder:
+
+```bash
+cd M4
+```
+
+#### Install the dependencies:
+
+```bash
+npm install
+```
+
+#### Running Tests
+
+To run the tests, use the following command:
+
+```bash
 npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.js
+```
+
+### Checking Coverage
+
+To check the code coverage, use the following command:
+
+```bash
+npx hardhat coverage
 ```

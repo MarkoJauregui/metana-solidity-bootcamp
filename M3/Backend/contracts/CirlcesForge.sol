@@ -5,7 +5,6 @@ import "./CirclesERC1155.sol";
 
 /**
  * @title CirclesForge
- * @author Marko Jauregui
  * @notice Forge contract to interact with CirclesERC1155.sol for forging logic.
  */
 contract CirclesForge {
@@ -27,11 +26,7 @@ contract CirclesForge {
     CirclesERC1155 private s_erc1155Contract;
 
     // Events
-    event TokenForged(
-        address indexed user,
-        uint256 indexed tokenId,
-        uint256 indexed amount
-    );
+    event TokenForged(address indexed user, uint256 indexed tokenId);
 
     /**
      * @dev Constructor that sets the address of the CirclesERC1155 contract.
@@ -43,102 +38,89 @@ contract CirclesForge {
 
     /**
      * @notice Forges Token 3 by burning tokens 0 & 1.
-     * @param _amount The amount of tokens to be burned in exchange for the same amount of forged tokens.
      */
-    function forgeToken3(uint256 _amount) external {
-        require(
-            s_erc1155Contract.balanceOf(msg.sender, TOKEN_ID_0) >= _amount,
-            "CirclesForge__InsufficientToken0"
-        );
-        require(
-            s_erc1155Contract.balanceOf(msg.sender, TOKEN_ID_1) >= _amount,
-            "CirclesForge__InsufficientToken1"
-        );
+    function forgeToken3() external {
+        if (s_erc1155Contract.balanceOf(msg.sender, TOKEN_ID_0) < 1) {
+            revert CirclesForge__InsufficientToken0();
+        }
+        if (s_erc1155Contract.balanceOf(msg.sender, TOKEN_ID_1) < 1) {
+            revert CirclesForge__InsufficientToken1();
+        }
 
         // Burn the required tokens from the user's balance
-        s_erc1155Contract.burn(msg.sender, TOKEN_ID_0, _amount);
-        s_erc1155Contract.burn(msg.sender, TOKEN_ID_1, _amount);
+        s_erc1155Contract.burn(msg.sender, TOKEN_ID_0);
+        s_erc1155Contract.burn(msg.sender, TOKEN_ID_1);
 
         // Mint the new token to the user's balance
-        s_erc1155Contract.mint(msg.sender, TOKEN_ID_3, _amount);
+        s_erc1155Contract.mint(msg.sender, TOKEN_ID_3);
 
-        emit TokenForged(msg.sender, TOKEN_ID_3, _amount);
+        emit TokenForged(msg.sender, TOKEN_ID_3);
     }
 
     /**
      * @notice Forges Token 4 by burning Tokens 1 & 2.
-     * @param _amount The number of tokens to forge.
      */
-    function forgeToken4(uint256 _amount) external {
-        require(
-            s_erc1155Contract.balanceOf(msg.sender, TOKEN_ID_1) >= _amount,
-            "CirclesForge__InsufficientToken1"
-        );
-        require(
-            s_erc1155Contract.balanceOf(msg.sender, TOKEN_ID_2) >= _amount,
-            "CirclesForge__InsufficientToken2"
-        );
+    function forgeToken4() external {
+        if (s_erc1155Contract.balanceOf(msg.sender, TOKEN_ID_1) < 1) {
+            revert CirclesForge__InsufficientToken1();
+        }
+        if (s_erc1155Contract.balanceOf(msg.sender, TOKEN_ID_2) < 1) {
+            revert CirclesForge__InsufficientToken2();
+        }
 
         // Burn the required tokens from the user's balance
-        s_erc1155Contract.burn(msg.sender, TOKEN_ID_1, _amount);
-        s_erc1155Contract.burn(msg.sender, TOKEN_ID_2, _amount);
+        s_erc1155Contract.burn(msg.sender, TOKEN_ID_1);
+        s_erc1155Contract.burn(msg.sender, TOKEN_ID_2);
 
         // Mint the new token to the user's balance
-        s_erc1155Contract.mint(msg.sender, TOKEN_ID_4, _amount);
+        s_erc1155Contract.mint(msg.sender, TOKEN_ID_4);
 
-        emit TokenForged(msg.sender, TOKEN_ID_4, _amount);
+        emit TokenForged(msg.sender, TOKEN_ID_4);
     }
 
     /**
      * @notice Forges Token 5 by burning tokens 0 & 2.
-     * @param _amount The number of tokens to forge.
      */
-    function forgeToken5(uint256 _amount) external {
-        require(
-            s_erc1155Contract.balanceOf(msg.sender, TOKEN_ID_0) >= _amount,
-            "CirclesForge__InsufficientToken0"
-        );
-        require(
-            s_erc1155Contract.balanceOf(msg.sender, TOKEN_ID_2) >= _amount,
-            "CirclesForge__InsufficientToken2"
-        );
+    function forgeToken5() external {
+        if (s_erc1155Contract.balanceOf(msg.sender, TOKEN_ID_0) < 1) {
+            revert CirclesForge__InsufficientToken0();
+        }
+        if (s_erc1155Contract.balanceOf(msg.sender, TOKEN_ID_2) < 1) {
+            revert CirclesForge__InsufficientToken2();
+        }
 
         // Burn the required tokens from the user's balance
-        s_erc1155Contract.burn(msg.sender, TOKEN_ID_0, _amount);
-        s_erc1155Contract.burn(msg.sender, TOKEN_ID_2, _amount);
+        s_erc1155Contract.burn(msg.sender, TOKEN_ID_0);
+        s_erc1155Contract.burn(msg.sender, TOKEN_ID_2);
 
         // Mint the new token to the user's balance
-        s_erc1155Contract.mint(msg.sender, TOKEN_ID_5, _amount);
+        s_erc1155Contract.mint(msg.sender, TOKEN_ID_5);
 
-        emit TokenForged(msg.sender, TOKEN_ID_5, _amount);
+        emit TokenForged(msg.sender, TOKEN_ID_5);
     }
 
     /**
      * @notice Forges Token 6 by burning tokens 0, 1, & 2.
-     * @param _amount The number of tokens to forge.
      */
-    function forgeToken6(uint256 _amount) external {
-        require(
-            s_erc1155Contract.balanceOf(msg.sender, TOKEN_ID_0) >= _amount,
-            "CirclesForge__InsufficientToken0"
-        );
-        require(
-            s_erc1155Contract.balanceOf(msg.sender, TOKEN_ID_1) >= _amount,
-            "CirclesForge__InsufficientToken1"
-        );
-        require(
-            s_erc1155Contract.balanceOf(msg.sender, TOKEN_ID_2) >= _amount,
-            "CirclesForge__InsufficientToken2"
-        );
+    function forgeToken6() external {
+        if (s_erc1155Contract.balanceOf(msg.sender, TOKEN_ID_0) < 1) {
+            revert CirclesForge__InsufficientToken0();
+        }
+        if (s_erc1155Contract.balanceOf(msg.sender, TOKEN_ID_1) < 1) {
+            revert CirclesForge__InsufficientToken1();
+        }
+        if (s_erc1155Contract.balanceOf(msg.sender, TOKEN_ID_2) < 1) {
+            revert CirclesForge__InsufficientToken2();
+        }
 
         // Burn the required tokens from the user's balance
-        s_erc1155Contract.burn(msg.sender, TOKEN_ID_0, _amount);
-        s_erc1155Contract.burn(msg.sender, TOKEN_ID_1, _amount);
-        s_erc1155Contract.burn(msg.sender, TOKEN_ID_2, _amount);
+        s_erc1155Contract.burn(msg.sender, TOKEN_ID_0);
+        s_erc1155Contract.burn(msg.sender, TOKEN_ID_1);
+        s_erc1155Contract.burn(msg.sender, TOKEN_ID_2);
 
         // Mint the new token to the user's balance
-        s_erc1155Contract.mint(msg.sender, TOKEN_ID_6, _amount);
+        s_erc1155Contract.mint(msg.sender, TOKEN_ID_6);
 
-        emit TokenForged(msg.sender, TOKEN_ID_6, _amount);
+        emit TokenForged(msg.sender, TOKEN_ID_6);
     }
 }

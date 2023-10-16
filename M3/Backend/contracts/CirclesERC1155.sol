@@ -9,6 +9,7 @@ error CirclesERC1155__InvalidTokenForTrade();
 error CirclesERC1155__NotTokenOwnerOrForgeContract();
 error CirclesERC1155__InvalidTokenForBurn();
 error CirclesERC1155__NotAMinter();
+error CirclesERC1155__NotAnAdmin();
 
 /**
  * @title CirclesERC1155
@@ -111,7 +112,9 @@ contract CirclesERC1155 is ERC1155, AccessControlDefaultAdminRules {
      * @param _forgingContract The address of the forging contract.
      */
     function setForgingContract(address _forgingContract) public {
-        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "Not an admin");
+        if (!hasRole(DEFAULT_ADMIN_ROLE, msg.sender)) {
+            revert CirclesERC1155__NotAnAdmin();
+        }
 
         if (s_forgingContract != address(0)) {
             revokeRole(MINTER_ROLE, s_forgingContract);

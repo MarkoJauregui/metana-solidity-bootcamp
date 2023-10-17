@@ -10,6 +10,9 @@ error CirclesERC1155__NotTokenOwnerOrForgeContract();
 error CirclesERC1155__InvalidTokenForBurn();
 error CirclesERC1155__NotAMinter();
 error CirclesERC1155__NotAnAdmin();
+error CirclesForge__CannotTradeForSameToken();
+error CirclesForge__InvalidTokenForTrade();
+error CirclesForge__InvalidDesiredToken();
 
 /**
  * @title CirclesERC1155
@@ -82,11 +85,16 @@ contract CirclesERC1155 is ERC1155, AccessControlDefaultAdminRules {
      * @param desiredToken The ID of the desired token.
      */
     function tradeToken(uint256 tokenId, uint256 desiredToken) public {
-        if (!(tokenId >= 3 && tokenId <= 6)) {
-            revert CirclesERC1155__InvalidTokenForTrade();
-        }
         if (!(desiredToken >= TOKEN_ID_0 && desiredToken <= TOKEN_ID_2)) {
-            revert CirclesERC1155__InvalidTokenForTrade();
+            revert CirclesForge__InvalidDesiredToken();
+        }
+
+        if (!(tokenId <= TOKEN_ID_6)) {
+            revert CirclesForge__InvalidTokenForTrade();
+        }
+
+        if (tokenId == desiredToken) {
+            revert CirclesForge__CannotTradeForSameToken();
         }
 
         _burn(msg.sender, tokenId, 1); // Amount set to 1

@@ -36,13 +36,13 @@ contract CirclesERC1155 is ERC1155, AccessControlDefaultAdminRules {
     mapping(address => uint256) private s_lastMintTimestamp; // Adjusted for global cooldown
 
     // Events
-    event Minted(address indexed user, uint256 indexed tokenId, uint256 amount);
-    event Burned(address indexed user, uint256 indexed tokenId, uint256 amount);
+    event Minted(address indexed account, uint256 indexed tokenId);
+    event Burned(address indexed account, uint256 indexed tokenId);
+
     event Traded(
         address indexed user,
         uint256 indexed tokenIdSold,
-        uint256 indexed tokenIdBought,
-        uint256 amount
+        uint256 indexed tokenIdBought
     );
 
     /**
@@ -73,7 +73,7 @@ contract CirclesERC1155 is ERC1155, AccessControlDefaultAdminRules {
         }
 
         _mint(account, tokenId, 1, ""); // Amount set to 1
-        emit Minted(msg.sender, tokenId, 1); // Amount set to 1
+        emit Minted(msg.sender, tokenId); // Amount set to 1
     }
 
     /**
@@ -91,7 +91,7 @@ contract CirclesERC1155 is ERC1155, AccessControlDefaultAdminRules {
 
         _burn(msg.sender, tokenId, 1); // Amount set to 1
         mint(msg.sender, desiredToken); // Amount set to 1 implicitly
-        emit Traded(msg.sender, tokenId, desiredToken, 1); // Amount set to 1
+        emit Traded(msg.sender, tokenId, desiredToken); // Amount set to 1
     }
 
     /**
@@ -99,12 +99,16 @@ contract CirclesERC1155 is ERC1155, AccessControlDefaultAdminRules {
      * @param tokenId The ID of the token to burn.
      */
     function burn(address account, uint256 tokenId) public {
-        if (tokenId < TOKEN_ID_3 || tokenId > TOKEN_ID_6) {
+        // Check if the sender has the MINTER_ROLE or the token is between 3 and 6
+        if (
+            !hasRole(MINTER_ROLE, msg.sender) &&
+            (tokenId < TOKEN_ID_3 || tokenId > TOKEN_ID_6)
+        ) {
             revert CirclesERC1155__InvalidTokenForBurn();
         }
 
         _burn(account, tokenId, 1); // Amount set to 1
-        emit Burned(account, tokenId, 1); // Amount set to 1
+        emit Burned(account, tokenId); // Amount set to 1
     }
 
     /**

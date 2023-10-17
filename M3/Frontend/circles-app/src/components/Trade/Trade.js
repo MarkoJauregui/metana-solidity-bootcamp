@@ -4,8 +4,7 @@ import { Web3Context } from '../../contexts/Web3Context';
 const Trade = () => {
 	const [selectedTokenToTrade, setSelectedTokenToTrade] = useState('3');
 	const [selectedTokenToReceive, setSelectedTokenToReceive] = useState('0');
-	const [amount, setAmount] = useState('');
-	const { circlesForge } = useContext(Web3Context);
+	const { circlesERC1155 } = useContext(Web3Context);
 
 	const tokenOptions = [
 		{ label: 'Token 0', value: '0' },
@@ -18,15 +17,24 @@ const Trade = () => {
 	];
 
 	const handleTrade = async () => {
-		// Handle the token trading logic here
 		console.log(
-			`Trading ${amount} of Token ${selectedTokenToTrade} for Token ${selectedTokenToReceive}`
+			`Trading Token ${selectedTokenToTrade} for Token ${selectedTokenToReceive}`
 		);
-		// ... (use the circlesForge context for calling the appropriate functions)
+
+		try {
+			// Assuming circlesERC1155 has a function tradeToken(tokenId, desiredToken)
+			await circlesERC1155.tradeToken(
+				selectedTokenToTrade,
+				selectedTokenToReceive
+			);
+			console.log('Trade successful!');
+		} catch (error) {
+			console.error('Error trading tokens:', error.message);
+		}
 	};
 
 	return (
-		<div className="my-6 p-4 border rounded shadow-md bg-white max-w-lg mx-auto">
+		<div className="container mx-auto py-6">
 			<h1 className="text-2xl font-semibold mb-4">Trade Tokens</h1>
 			<div className="flex flex-col space-y-4">
 				<label
@@ -40,7 +48,7 @@ const Trade = () => {
 					onChange={(e) => setSelectedTokenToTrade(e.target.value)}
 					className="mt-1 block w-full py-2 px-3 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm border-gray-300"
 				>
-					{tokenOptions.slice(3).map((token, index) => (
+					{tokenOptions.map((token, index) => (
 						<option key={index} value={token.value}>
 							{token.label}
 						</option>
@@ -64,19 +72,6 @@ const Trade = () => {
 						</option>
 					))}
 				</select>
-
-				<label
-					htmlFor="amount"
-					className="block text-sm font-medium text-gray-700"
-				>
-					Amount
-				</label>
-				<input
-					type="number"
-					value={amount}
-					onChange={(e) => setAmount(e.target.value)}
-					className="mt-1 block w-full py-2 px-3 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm border-gray-300"
-				/>
 
 				<button
 					className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 focus:outline-none"

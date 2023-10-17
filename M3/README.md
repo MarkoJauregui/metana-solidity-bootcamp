@@ -53,7 +53,7 @@ A blockchain-based project that allows users to mint, forge, and trade tokens. T
 
 3. Copy the `.env.example` file to a new file named `.env` and update the REACT_APP_INFURA_URL with your Infura URL as well as your private key and optionally your Polyscan API key for contract verification.
 
-4. Ensure that the contract addresses in `contractConfig` are set to your deployed contracts or you can use the provided addresses that are already deployed on the Mumbai testnet in the following addresses: [CirclesERC1155](https://mumbai.polygonscan.com/address/0x41ef3fecaaf5e4f34f4a5efeb46e3e023454a1e6#code) & [CirclesForge](0x31fFfD21EE2d68E0b96F4DB99c565feb0Ae25353).
+4. Ensure that the contract addresses in `contractConfig` are set to your deployed contracts or you can use the provided addresses that are already deployed on the Mumbai testnet in the following addresses: [CirclesERC1155](https://mumbai.polygonscan.com/address/0xE4900D0702c651d0050866A5f8d99DC6f6FE3bD9#code) & [CirclesForge](https://mumbai.polygonscan.com/address/0x463e5752d320B9dE669985cFE61593ca1Ba2Bc4c#code).
 
 5. Start the React app:
    ```

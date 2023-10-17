@@ -1,10 +1,12 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { Web3Context } from '../../contexts/Web3Context';
+import { ethers } from 'ethers';
 
 function UserInfo() {
 	const { signer, circlesERC1155, address } = useContext(Web3Context);
 	const [selectedTokenId, setSelectedTokenId] = useState(0);
 	const [tokenBalance, setTokenBalance] = useState(0);
+	const [maticBalance, setMaticBalance] = useState(0);
 
 	const fetchBalance = async () => {
 		if (circlesERC1155 && signer && address) {
@@ -12,6 +14,17 @@ function UserInfo() {
 			setTokenBalance(balance.toString());
 		}
 	};
+
+	const fetchMaticBalance = async () => {
+		if (signer && address) {
+			const balance = await signer.getBalance();
+			setMaticBalance(ethers.utils.formatEther(balance));
+		}
+	};
+
+	useEffect(() => {
+		fetchMaticBalance();
+	}, [address]);
 
 	return (
 		<div className="container mx-auto p-4">
@@ -47,6 +60,9 @@ function UserInfo() {
 				<p className="text-gray-700">
 					Balance for Token {selectedTokenId}:{' '}
 					<span className="font-bold">{tokenBalance}</span>
+				</p>
+				<p className="text-gray-700">
+					MATIC Balance: <span className="font-bold">{maticBalance}</span>
 				</p>
 			</div>
 		</div>

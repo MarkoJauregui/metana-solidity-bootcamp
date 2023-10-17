@@ -1,6 +1,6 @@
 const contractAddresses = {
-	CirclesERC1155: '0x41Ef3feCaAF5e4F34F4A5eFEB46e3E023454a1E6',
-	CirclesForge: '0x31fFfD21EE2d68E0b96F4DB99c565feb0Ae25353',
+	CirclesERC1155: '0xD33fb68519410bAFA3dcd5F83962802cc65a2FB6',
+	CirclesForge: '0xd54c7DEB2f54770D5920c4df76f05c6FE6d23ea8',
 };
 
 export default contractAddresses;

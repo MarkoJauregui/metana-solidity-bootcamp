@@ -17,6 +17,19 @@ export function Web3ProviderComponent({ children }) {
 	const [address, setAddress] = useState(null);
 	const [circlesERC1155, setCirclesERC1155] = useState(null);
 	const [circlesForge, setCirclesForge] = useState(null);
+	const [networkId, setNetworkId] = useState(null);
+
+	const MUMBAI_NETWORK_PARAMS = {
+		chainId: '0x13881', // This is the chainId for Mumbai in hexadecimal
+		chainName: 'Mumbai Testnet',
+		nativeCurrency: {
+			name: 'MATIC',
+			symbol: 'MATIC',
+			decimals: 18,
+		},
+		rpcUrls: ['https://rpc-mumbai.maticvigil.com/'],
+		blockExplorerUrls: ['https://explorer-mumbai.maticvigil.com/'],
+	};
 
 	useEffect(() => {
 		if (typeof window.ethereum !== 'undefined') {
@@ -36,6 +49,11 @@ export function Web3ProviderComponent({ children }) {
 			);
 			setCirclesERC1155(_circlesERC1155);
 			setCirclesForge(_circlesForge);
+
+			// Get and set the network ID
+			_provider.getNetwork().then((net) => {
+				setNetworkId(net.chainId);
+			});
 		} else {
 			// If Metamask is not installed, fall back to Infura
 			const infuraProvider = new ethers.providers.JsonRpcProvider(
@@ -51,6 +69,23 @@ export function Web3ProviderComponent({ children }) {
 				method: 'eth_requestAccounts',
 			});
 			setAddress(accounts[0]);
+
+			// Check current network and switch to Mumbai if necessary
+			if (networkId !== 80001) {
+				try {
+					await window.ethereum.request({
+						method: 'wallet_addEthereumChain',
+						params: [MUMBAI_NETWORK_PARAMS],
+					});
+					// After switching, you can update the networkId state again
+					const _networkId = await provider
+						.getNetwork()
+						.then((net) => net.chainId);
+					setNetworkId(_networkId);
+				} catch (error) {
+					console.error('Failed to switch to the Mumbai network:', error);
+				}
+			}
 		} else {
 			console.error('Ethereum provider is not available.');
 		}

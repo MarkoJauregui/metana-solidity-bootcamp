@@ -11,16 +11,28 @@ function Mint() {
 	const handleMint = async () => {
 		if (circlesERC1155 && signer && address) {
 			try {
-				const tx = await circlesERC1155.mint(address, selectedTokenId, amount);
+				// Check if tokenId is 0-2 and provide feedback about cooldown
+				if (parseInt(selectedTokenId) <= 2) {
+					const lastMintTimestamp = await circlesERC1155.getLastMintTimestamp(
+						address
+					);
+					if (Date.now() / 1000 - lastMintTimestamp < 60) {
+						// Assuming 1 minute cooldown for simplicity
+						setError('Cooldown not elapsed. Please wait before minting again.');
+						return;
+					}
+				}
+
+				const tx = await circlesERC1155.mint(address, selectedTokenId, {
+					gasLimit: 200000, // An arbitrary gas limit, adjust as needed
+				});
 				const receipt = await tx.wait();
 
 				// Find the Minted event from the transaction receipt
 				const mintedEvent = receipt.events?.find((e) => e.event === 'Minted');
 
 				if (mintedEvent) {
-					setMintedMessage(
-						`Minted ${mintedEvent.args.amount} tokens of ID ${mintedEvent.args.tokenId}!`
-					);
+					setMintedMessage(`Minted 1 token of ID ${mintedEvent.args.tokenId}!`);
 					setError('');
 				} else {
 					setError('Minted successfully, but could not find the Minted event.');
@@ -62,19 +74,6 @@ function Mint() {
 					<option value="1">Token ID 1</option>
 					<option value="2">Token ID 2</option>
 				</select>
-			</div>
-
-			<div className="mb-4">
-				<label htmlFor="amount" className="block font-medium mb-2">
-					Amount:
-				</label>
-				<input
-					type="number"
-					id="amount"
-					className="border border-gray-300 rounded-md p-2"
-					value={amount}
-					onChange={(e) => setAmount(parseInt(e.target.value))}
-				/>
 			</div>
 
 			<button

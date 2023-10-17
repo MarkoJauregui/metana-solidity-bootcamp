@@ -27,6 +27,7 @@ async function main() {
   // Grant minting rights to CirclesForge contract
   await circlesERC1155.grantRole(
     circlesERC1155.MINTER_ROLE(),
+
     circlesForge.address
   );
   console.log("Granted minting rights to CirclesForge contract");

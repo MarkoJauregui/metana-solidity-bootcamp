@@ -7,11 +7,13 @@
     "start": "next start"
   },
   "dependencies": {
+    "alchemy-sdk": "^2.10.1",
+    "apexcharts": "^3.44.0",
+    "ethers": "^6.8.0",
     "next": "12.0.0",
     "react": "17.0.2",
+    "react-apexcharts": "^1.4.1",
     "react-dom": "17.0.2",
-    "alchemy-sdk": "^2.10.1",
-    "ethers": "^6.8.0",
     "tailwindcss": "^3.0.0"
   },
   "devDependencies": {

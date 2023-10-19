@@ -1,7 +1,7 @@
 import Head from 'next/head';
-import ERC20Volume from '../src/components/ERC20Volume';
-import BaseFee from '../src/components/BaseFee';
-import GasRatio from '@/components/GasRatio/GasRatio';
+import ERC20Volume from '../src/components/ERC20Volume/ERC20Volume';
+import BaseFee from '../src/components/BaseFee/BaseFee';
+import GasRatio from '../src/components/GasRatio/GasRatio';
 
 export default function Home() {
 	return (

@@ -1,7 +1,7 @@
 import { Alchemy, Network } from 'alchemy-sdk';
 
 const settings = {
-	apiKey: process.env.NEXT_ALCHEMY_RPC_URL, // Replace with your actual Alchemy API key.
+	apiKey: process.env.NEXT_PUBLIC_ALCHEMY_RPC_URL,
 	network: Network.ETH_MAINNET,
 };
 

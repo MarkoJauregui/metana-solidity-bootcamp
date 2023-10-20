@@ -1,96 +1,46 @@
 import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import alchemy from '../../utils/alchemy';
+import alchemy from '../../utils/alchemy'; // Adjust the path according to your project structure
 
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
-const BaseFeeChart = () => {
+export default function BaseFeeChart() {
 	const [baseFees, setBaseFees] = useState([]);
-	const [isLoading, setIsLoading] = useState(true);
-
-	const getLast10BaseFees = async () => {
-		const latestBlock = await alchemy.core.getBlockNumber();
-		const blocksToFetch = Array.from({ length: 10 }, (_, i) => latestBlock - i);
-		const fetchedBaseFees = await Promise.all(
-			blocksToFetch.map(async (blockNum) => {
-				const blockDetails = await alchemy.core.getBlockWithTransactions(
-					blockNum
-				);
-				return {
-					blockNum,
-					baseFee: blockDetails.baseFeePerGas,
-				};
-			})
-		);
-
-		return fetchedBaseFees;
-	};
 
 	useEffect(() => {
-		(async () => {
-			try {
-				const fetchedBaseFees = await getLast10BaseFees();
-				setBaseFees(fetchedBaseFees);
-			} catch (error) {
-				console.error('Error fetching base fees:', error);
-			} finally {
-				setIsLoading(false);
+		const fetchData = async () => {
+			let fees = [];
+			const latestBlock = await alchemy.core.getBlockNumber();
+			for (let i = 0; i < 10; i++) {
+				const block = await alchemy.core.getBlock(latestBlock - i);
+				fees.push(block.baseFeePerGas);
 			}
-		})();
+			setBaseFees(fees.reverse()); // we reverse to get oldest to newest
+		};
+
+		fetchData();
 	}, []);
 
-	const options = {
+	const chartOptions = {
 		chart: {
-			id: 'basic-bar',
-			toolbar: {
-				show: false,
-			},
+			type: 'line',
 		},
-		colors: ['#9F7AEA'], // Purple color
 		xaxis: {
-			categories: baseFees.map((t) => t.blockNum),
-			labels: {
-				style: {
-					fontSize: '12px',
-				},
-			},
+			categories: Array.from({ length: 10 }, (_, i) => `Block ${i + 1}`),
 		},
 		yaxis: {
-			labels: {
-				style: {
-					fontSize: '12px',
-				},
+			title: {
+				text: 'Base Fee',
 			},
 		},
-		dataLabels: {
-			enabled: false,
-		},
+		colors: ['#FF4560'],
 	};
 
-	const series = [
-		{
-			name: 'Base Fees',
-			data: baseFees.map((t) => parseFloat(t.baseFee)),
-		},
-	];
-
 	return (
-		<div className="flex justify-center items-center min-h-screen bg-gray-100">
-			<div className="w-full md:w-3/4 lg:w-2/3 xl:w-1/2 p-4 shadow-md bg-white rounded">
-				{isLoading ? (
-					<div>Loading...</div>
-				) : (
-					<Chart
-						options={options}
-						series={series}
-						type="bar"
-						width="100%"
-						height="400"
-					/>
-				)}
-			</div>
-		</div>
+		<Chart
+			options={chartOptions}
+			series={[{ name: 'Base Fee', data: baseFees }]}
+			type="line"
+		/>
 	);
-};
-
-export default BaseFeeChart;
+}

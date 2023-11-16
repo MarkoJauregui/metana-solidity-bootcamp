@@ -7,11 +7,12 @@ import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/utils/structs/BitMaps.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 /// @title Advanced NFT Contract
 /// @notice Implements an NFT with Merkle Tree based airdrop, commit-reveal for random NFT ID, and custom error handling.
 /// @author Marko Jauregui
-contract AdvancedNFT is ERC721, Pausable, Multicall, Ownable {
+contract AdvancedNFT is ERC721, Pausable, Multicall, Ownable, ReentrancyGuard {
     using BitMaps for BitMaps.BitMap;
 
     enum SaleState {
@@ -145,4 +146,32 @@ contract AdvancedNFT is ERC721, Pausable, Multicall, Ownable {
     function endSale() external onlyOwner {
         saleState = SaleState.SoldOut;
     }
+
+    /// @notice Withdraws funds to multiple addresses.
+    /// @param recipients Array of recipient addresses.
+    /// @param amounts Array of amounts to withdraw to each recipient.
+    function withdrawFunds(
+        address[] calldata recipients,
+        uint256[] calldata amounts
+    ) public onlyOwner nonReentrant {
+        require(
+            recipients.length == amounts.length,
+            "AdvancedNFT: Mismatched input lengths"
+        );
+
+        uint256 totalAmount = 0;
+        for (uint i = 0; i < amounts.length; i++) {
+            totalAmount += amounts[i];
+        }
+        require(
+            address(this).balance >= totalAmount,
+            "AdvancedNFT: Insufficient balance"
+        );
+
+        for (uint i = 0; i < recipients.length; i++) {
+            payable(recipients[i]).transfer(amounts[i]);
+        }
+    }
+
+    receive() external payable {}
 }

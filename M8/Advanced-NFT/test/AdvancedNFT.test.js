@@ -169,7 +169,7 @@ describe('AdvancedNFT', function () {
 
 		await expect(
 			advancedNFT.connect(eligibleAddresses[0]).mintWithMerkleProof(proof, 5)
-		).to.be.revertedWith('AdvancedNFT: Not in the correct sale state');
+		).to.be.revertedWith('AdvancedNFT__NotInCorrectSaleState');
 
 		await advancedNFT.connect(owner).startPublicSale();
 
@@ -188,7 +188,7 @@ describe('AdvancedNFT', function () {
 
 		await expect(
 			advancedNFT.connect(eligibleAddresses[1]).mintWithMerkleProof(proof, 6)
-		).to.be.revertedWith('AdvancedNFT: Not in the correct sale state');
+		).to.be.revertedWith('AdvancedNFT__NotInCorrectSaleState');
 	});
 
 	it('Should allow the owner to withdraw funds to multiple recipients', async function () {

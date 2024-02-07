@@ -2,9 +2,10 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@chainlink/contracts/src/v0.8/vrf/VRFConsumerBaseV2.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
+import "./TicketNFT.sol"; // Ensure this path is correct
+import "./WinnerNFT.sol"; // Ensure this path is correct
 
 /// @title Decentralized NFT Lottery System
 /// @dev Manages the NFT lottery system, including ticket sales and winner selection.
@@ -13,6 +14,7 @@ contract Lottery is VRFConsumerBaseV2, Ownable {
     bool private s_lotteryActive;
     uint256 private s_lotteryPool;
     address[] private s_participants;
+    uint256 private s_currentLotteryId;
 
     // Chainlink VRF variables
     VRFCoordinatorV2Interface private immutable i_vrfCoordinator;
@@ -22,6 +24,10 @@ contract Lottery is VRFConsumerBaseV2, Ownable {
     uint16 private constant REQUEST_CONFIRMATIONS = 3;
     uint32 private constant NUM_WORDS = 1;
 
+    // NFT contracts
+    TicketNFT private immutable s_ticketNFT;
+    WinnerNFT private immutable s_winnerNFT;
+
     // Custom errors
     error Lottery__LotteryAlreadyStarted();
     error Lottery__LotteryNotActive();
@@ -29,23 +35,34 @@ contract Lottery is VRFConsumerBaseV2, Ownable {
     error Lottery__TransferFailed();
 
     // Events
-    event LotteryStarted();
-    event LotteryEnded(address winner);
-    event TicketPurchased(address indexed buyer, uint256 amount);
+    event LotteryStarted(uint256 lotteryId);
+    event LotteryEnded(address winner, uint256 lotteryId);
+    event TicketPurchased(
+        address indexed buyer,
+        uint256 amount,
+        uint256 lotteryId
+    );
 
     /// @notice Constructor to set initial values and Chainlink VRF details
     /// @param vrfCoordinator The address of the Chainlink VRF Coordinator
     /// @param keyHash The key hash for the Chainlink VRF
     /// @param subscriptionId The subscription ID for the Chainlink VRF
+    /// @param ticketNFTAddress The address of the TicketNFT contract
+    /// @param winnerNFTAddress The address of the WinnerNFT contract
     constructor(
         address vrfCoordinator,
         bytes32 keyHash,
         uint64 subscriptionId,
+        address ticketNFTAddress,
+        address winnerNFTAddress,
         address initialOwner
     ) VRFConsumerBaseV2(vrfCoordinator) Ownable(initialOwner) {
         i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinator);
         i_keyHash = keyHash;
         i_subscriptionId = subscriptionId;
+        s_ticketNFT = TicketNFT(ticketNFTAddress);
+        s_winnerNFT = WinnerNFT(winnerNFTAddress);
+        transferOwnership(msg.sender); // Set the owner
     }
 
     /// @notice Starts the lottery, allowing tickets to be purchased
@@ -54,7 +71,8 @@ contract Lottery is VRFConsumerBaseV2, Ownable {
         if (s_lotteryActive) revert Lottery__LotteryAlreadyStarted();
         s_ticketPrice = ticketPrice;
         s_lotteryActive = true;
-        emit LotteryStarted();
+        s_currentLotteryId++;
+        emit LotteryStarted(s_currentLotteryId);
     }
 
     /// @notice Allows users to buy lottery tickets
@@ -70,7 +88,8 @@ contract Lottery is VRFConsumerBaseV2, Ownable {
         }
 
         s_lotteryPool += msg.value;
-        emit TicketPurchased(msg.sender, amount);
+        s_ticketNFT.mint(msg.sender, s_currentLotteryId, amount, "");
+        emit TicketPurchased(msg.sender, amount, s_currentLotteryId);
     }
 
     /// @notice Ends the lottery, selects a random winner, and resets the lottery
@@ -82,7 +101,6 @@ contract Lottery is VRFConsumerBaseV2, Ownable {
 
     /// @notice Requests randomness to select a lottery winner
     function requestRandomWinner() private {
-        // Request randomness
         uint256 requestId = i_vrfCoordinator.requestRandomWords(
             i_keyHash,
             i_subscriptionId,
@@ -95,14 +113,15 @@ contract Lottery is VRFConsumerBaseV2, Ownable {
     /// @notice Callback function used by VRF Coordinator
     /// @param randomWords The array of random values returned by VRF Coordinator
     function fulfillRandomWords(
-        uint256,
-        /* requestId */ uint256[] memory randomWords
+        uint256, // requestId
+        uint256[] memory randomWords
     ) internal override {
         uint256 winnerIndex = randomWords[0] % s_participants.length;
         address winner = s_participants[winnerIndex];
         (bool success, ) = winner.call{value: s_lotteryPool}("");
         if (!success) revert Lottery__TransferFailed();
-        emit LotteryEnded(winner);
+        s_winnerNFT.mint(winner);
+        emit LotteryEnded(winner, s_currentLotteryId);
         // Reset the lottery for the next round
         s_lotteryPool = 0;
         delete s_participants;

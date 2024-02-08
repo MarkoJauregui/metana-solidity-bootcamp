@@ -10,3 +10,6 @@
 [submodule "Capstone/lib/chainlink-brownie-contracts"]
 	path = Capstone/lib/chainlink-brownie-contracts
 	url = https://github.com/smartcontractkit/chainlink-brownie-contracts
+[submodule "Capstone/lib/openzeppelin-contracts"]
+	path = Capstone/lib/openzeppelin-contracts
+	url = https://github.com/OpenZeppelin/openzeppelin-contracts

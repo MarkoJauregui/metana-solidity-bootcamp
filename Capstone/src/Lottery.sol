@@ -2,14 +2,13 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@chainlink/contracts/src/v0.8/vrf/VRFConsumerBaseV2.sol";
-import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
+import "@chainlink/contracts/src/v0.8/dev/VRFConsumerBase.sol";
 import "./TicketNFT.sol"; // Ensure this path is correct
 import "./WinnerNFT.sol"; // Ensure this path is correct
 
 /// @title Decentralized NFT Lottery System
 /// @dev Manages the NFT lottery system, including ticket sales and winner selection.
-contract Lottery is VRFConsumerBaseV2, Ownable {
+contract Lottery is VRFConsumerBase, Ownable {
     uint256 private s_ticketPrice;
     bool private s_lotteryActive;
     uint256 private s_lotteryPool;

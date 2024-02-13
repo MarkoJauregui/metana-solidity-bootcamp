@@ -19,3 +19,6 @@
 [submodule "lib/chainlink"]
 	path = lib/chainlink
 	url = https://github.com/smartcontractkit/chainlink
+[submodule "Capstone/lib/chainlink"]
+	path = Capstone/lib/chainlink
+	url = https://github.com/smartcontractkit/chainlink

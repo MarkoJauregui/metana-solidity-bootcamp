@@ -35,10 +35,11 @@ contract Lottery is VRFConsumerBaseV2, Ownable, KeeperCompatibleInterface {
     WinnerNFT private immutable s_winnerNFT;
 
     // Custom errors
-    error LotteryAlreadyStarted();
-    error LotteryNotActive();
-    error InsufficientPayment(uint256 sent, uint256 required);
-    error TransferFailed();
+    error Lottery__AlreadyStarted();
+    error Lottery__NotActive();
+    error Lottery__InsufficientPayment(uint256 sent, uint256 required);
+    error Lottery__TransferFailed();
+    error Lottery__IntervalNotReached();
 
     // Events
     event LotteryStarted(uint256 lotteryId);
@@ -70,7 +71,7 @@ contract Lottery is VRFConsumerBaseV2, Ownable, KeeperCompatibleInterface {
 
     /// @notice Starts the lottery, allowing tickets to be purchased
     function startLottery(uint256 ticketPrice) public onlyOwner {
-        if (s_lotteryActive) revert LotteryAlreadyStarted();
+        if (s_lotteryActive) revert Lottery__AlreadyStarted();
         s_ticketPrice = ticketPrice;
         s_lotteryActive = true;
         s_currentLotteryId++;
@@ -80,10 +81,10 @@ contract Lottery is VRFConsumerBaseV2, Ownable, KeeperCompatibleInterface {
 
     /// @notice Allows users to buy lottery tickets
     function buyTickets(uint256 amount) external payable {
-        if (!s_lotteryActive) revert LotteryNotActive();
+        if (!s_lotteryActive) revert Lottery__NotActive();
         uint256 requiredPayment = s_ticketPrice * amount;
         if (msg.value < requiredPayment)
-            revert InsufficientPayment(msg.value, requiredPayment);
+            revert Lottery__InsufficientPayment(msg.value, requiredPayment);
 
         for (uint256 i = 0; i < amount; i++) {
             s_participants.push(msg.sender);
@@ -96,7 +97,7 @@ contract Lottery is VRFConsumerBaseV2, Ownable, KeeperCompatibleInterface {
 
     /// @notice Ends the lottery, selects a random winner, and resets the lottery
     function endLottery() public onlyOwner {
-        if (!s_lotteryActive) revert LotteryNotActive();
+        if (!s_lotteryActive) revert Lottery__NotActive();
         s_lotteryActive = false;
         requestRandomWinner();
     }
@@ -121,7 +122,7 @@ contract Lottery is VRFConsumerBaseV2, Ownable, KeeperCompatibleInterface {
         address winner = s_participants[winnerIndex];
         s_lastWinner = winner;
         (bool success, ) = winner.call{value: s_lotteryPool}("");
-        if (!success) revert TransferFailed();
+        if (!success) revert Lottery__TransferFailed();
         s_winnerNFT.mint(winner);
         emit LotteryEnded(winner, s_currentLotteryId);
         s_lotteryPool = 0;
@@ -144,12 +145,11 @@ contract Lottery is VRFConsumerBaseV2, Ownable, KeeperCompatibleInterface {
     }
 
     /// @notice Keeper-compatible function to perform upkeep
+    /// @notice Keeper-compatible function to perform upkeep
     function performUpkeep(bytes calldata /* performData */) external override {
-        require(
-            (block.timestamp - lastLotteryStartTime) > interval,
-            "Interval not reached"
-        );
-        require(s_lotteryActive, "Lottery not active");
+        if ((block.timestamp - lastLotteryStartTime) <= interval)
+            revert Lottery__IntervalNotReached();
+        if (!s_lotteryActive) revert Lottery__NotActive();
         endLottery();
         startLottery(s_ticketPrice);
         lastLotteryStartTime = block.timestamp;

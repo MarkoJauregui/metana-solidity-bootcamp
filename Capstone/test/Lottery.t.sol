@@ -133,7 +133,7 @@ contract LotteryTest is Test {
         address testAddress = address(2);
         vm.deal(testAddress, totalCost); // Ensure the address has enough ether
         vm.prank(testAddress); // Impersonate the address for the next call
-        vm.expectRevert(Lottery.LotteryNotActive.selector); // Expect the specific revert selector
+        vm.expectRevert(Lottery.Lottery__NotActive.selector); // Expect the specific revert selector
         lottery.buyTickets{value: totalCost}(amountToBuy); // Attempt to buy tickets
     }
 
@@ -230,7 +230,7 @@ contract LotteryTest is Test {
     }
 
     function testBuyTicketsWhenNotActive() public {
-        vm.expectRevert(Lottery.LotteryNotActive.selector);
+        vm.expectRevert(Lottery.Lottery__NotActive.selector);
         lottery.buyTickets{value: ticketPrice}(1);
     }
 
@@ -241,7 +241,7 @@ contract LotteryTest is Test {
 
         // Attempt to start the lottery again as the owner
         vm.prank(owner);
-        vm.expectRevert(Lottery.LotteryAlreadyStarted.selector);
+        vm.expectRevert(Lottery.Lottery__AlreadyStarted.selector);
         lottery.startLottery(ticketPrice);
     }
 
@@ -267,7 +267,7 @@ contract LotteryTest is Test {
 
         // Attempt to end the lottery again as the owner
         vm.prank(owner);
-        vm.expectRevert(Lottery.LotteryNotActive.selector); // Expect the specific revert selector for an inactive lottery
+        vm.expectRevert(Lottery.Lottery__NotActive.selector); // Expect the specific revert selector for an inactive lottery
         lottery.endLottery();
     }
 }

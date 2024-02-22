@@ -28,7 +28,7 @@ contract Lottery is VRFConsumerBaseV2, Ownable, KeeperCompatibleInterface {
 
     // Timing for Chainlink Automation
     uint256 public lastLotteryStartTime;
-    uint256 public interval = 24 hours;
+    uint256 public interval = 10 minutes;
 
     // NFT contracts
     TicketNFT private immutable s_ticketNFT;

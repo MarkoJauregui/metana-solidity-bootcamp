@@ -4,7 +4,7 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "base64-sol/base64.sol";
+import "./utils/Base64.sol";
 
 contract WinnerNFT is ERC721URIStorage, Ownable {
     using Strings for uint256;
@@ -16,8 +16,6 @@ contract WinnerNFT is ERC721URIStorage, Ownable {
     ) ERC721("WinnerNFT", "WNFT") Ownable(initialOwner) {}
 
     /// @notice Mint a WinnerNFT with on-chain metadata
-    /// @param to The recipient of the NFT
-    /// @return tokenId The new token ID
     function mint(address to) external onlyOwner returns (uint256) {
         _tokenIds++;
         uint256 newTokenId = _tokenIds;
@@ -29,7 +27,7 @@ contract WinnerNFT is ERC721URIStorage, Ownable {
     /// @dev Generates on-chain metadata with an SVG image
     function generateTokenURI(
         uint256 tokenId
-    ) private view returns (string memory) {
+    ) private pure returns (string memory) {
         string memory svg = generateSVGImage(tokenId);
         string memory imageURI = string(
             abi.encodePacked(

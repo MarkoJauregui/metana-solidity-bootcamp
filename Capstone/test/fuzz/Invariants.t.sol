@@ -39,7 +39,13 @@ contract Invariants is Test {
         console.log("weth value: ", wethValue);
         console.log("wbtc value: ", wbtcValue);
         console.log("total supply: ", totalSupply);
+        console.log("Times mint Called: ", handler.timesMintIsCalled());
 
         assert(wethValue + wbtcValue >= totalSupply);
+    }
+
+    function invariant_gettersShouldNotRevert() public {
+        engine.getLiquidationBonus();
+        engine.getPrecision();
     }
 }

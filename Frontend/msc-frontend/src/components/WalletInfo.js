@@ -1,21 +1,27 @@
+// src/components/WalletInfo.js
 import React from 'react';
-import { useWallet } from '../hooks/useWallet';
-import { useEthBalance } from '../hooks/useEthBalance';
-import { formatAddress, formatBalance } from '../utils/format';
+import { useEthereum } from '../hooks/useEthereum';
 
 const WalletInfo = () => {
-	const { address, connectWallet } = useWallet();
-	const { balance } = useEthBalance(address);
+	const { address, balance } = useEthereum();
 
+	const formatAddress = (address) =>
+		`${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
+
+	// components/WalletInfo.js
 	return (
-		<div>
+		<div className="mt-4 p-4 bg-gray-100 rounded-lg shadow">
 			{address ? (
 				<>
-					<div>Address: {formatAddress(address)}</div>
-					<div>Balance: {formatBalance(balance)} ETH</div>
+					<p className="text-lg font-semibold">
+						Address: {formatAddress(address)}
+					</p>
+					<p className="text-lg">
+						Balance: {parseFloat(balance).toFixed(4)} ETH
+					</p>
 				</>
 			) : (
-				<button onClick={connectWallet}>Connect Wallet</button>
+				<p className="text-red-500">Connect your wallet to view information.</p>
 			)}
 		</div>
 	);

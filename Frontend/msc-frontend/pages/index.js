@@ -5,6 +5,8 @@ import WalletInfo from '@/components/WalletInfo';
 import DepositAndMintForm from '@/components/DepositAndMintForm';
 import RedeemCollateralForm from '@/components/RedeemCollateralForm';
 import { useEthereum } from '@/hooks/useEthereum';
+import HealthFactorForm from '@/components/HealthFactorForm';
+
 export default function Home() {
 	const { address, isConnected } = useEthereum();
 
@@ -25,7 +27,8 @@ export default function Home() {
 							<DepositAndMintForm userAddress={address} />
 							<br />
 							<RedeemCollateralForm userAddress={address} />
-							{/* Additional components can be added here */}
+							<br />
+							<HealthFactorForm userAddress={address} />
 						</>
 					)}
 				</div>

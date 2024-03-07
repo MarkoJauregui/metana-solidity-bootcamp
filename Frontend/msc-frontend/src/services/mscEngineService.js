@@ -135,3 +135,53 @@ export const redeemCollateralForMsc = async (
 	await tx.wait();
 	console.log('Collateral redeemed and MSC burned successfully');
 };
+
+export const getHealthFactor = async (userAddress) => {
+	const provider = getProviderOrSigner();
+	const contract = mscEngineContract(provider);
+	try {
+		const healthFactor = await contract.getHealthFactor(userAddress);
+		return ethers.utils.formatUnits(healthFactor, 'ether');
+	} catch (error) {
+		console.error('Error fetching health factor:', error);
+		throw error;
+	}
+};
+
+export const liquidate = async (
+	collateral,
+	user,
+	debtToCover,
+	operatorAddress
+) => {
+	const signer = getProviderOrSigner(true);
+	const contract = mscEngineContract(signer);
+	try {
+		await contract.liquidate(
+			collateral,
+			user,
+			ethers.utils.parseEther(debtToCover),
+			{ from: operatorAddress }
+		);
+		console.log('Liquidation successful');
+	} catch (error) {
+		console.error('Error during liquidation:', error);
+		throw error;
+	}
+};
+
+export const getMscTotalSupply = async () => {
+	const provider = getProviderOrSigner();
+	const mscContract = new ethers.Contract(
+		contractAddresses.msc,
+		MetanaStableCoinABI,
+		provider
+	);
+	try {
+		const totalSupply = await mscContract.totalSupply();
+		return ethers.utils.formatUnits(totalSupply, 'ether');
+	} catch (error) {
+		console.error('Error fetching MSC total supply:', error);
+		throw error;
+	}
+};

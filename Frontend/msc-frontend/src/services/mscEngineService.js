@@ -68,14 +68,12 @@ export const getUsdValue = async (tokenAddress, amountInWei) => {
 		const provider = getProviderOrSigner();
 		const contract = mscEngineContract(provider);
 		const usdValue = await contract.getUsdValue(tokenAddress, amountInWei);
-		return ethers.utils.formatUnits(usdValue, 'ether'); // Assuming the contract returns the value in wei
+		return ethers.utils.formatUnits(usdValue, 'ether');
 	} catch (error) {
 		console.error('Error fetching USD value:', error);
 		throw error;
 	}
 };
-
-// Assuming MSCEngineABI and contractAddresses are already imported
 
 export const getAccountInformation = async (userAddress) => {
 	const provider = getProviderOrSigner();
@@ -88,11 +86,11 @@ export const getAccountInformation = async (userAddress) => {
 		const [totalMscMinted, collateralValueInUsd] =
 			await contract.getAccountInformation(userAddress);
 		return {
-			totalMscMinted: ethers.utils.formatUnits(totalMscMinted, 'ether'), // Adjust based on your token's decimals
+			totalMscMinted: ethers.utils.formatUnits(totalMscMinted, 'ether'),
 			collateralValueInUsd: ethers.utils.formatUnits(
 				collateralValueInUsd,
 				'ether'
-			), // Assuming USD value is also in wei format
+			),
 		};
 	} catch (error) {
 		console.error('Error fetching account information:', error);
@@ -149,20 +147,23 @@ export const getHealthFactor = async (userAddress) => {
 };
 
 export const liquidate = async (
-	collateral,
-	user,
+	collateralAddress,
+	userAddress,
 	debtToCover,
-	operatorAddress
+	liquidatorAddress
 ) => {
 	const signer = getProviderOrSigner(true);
-	const contract = mscEngineContract(signer);
+	const contract = mscEngineContract().connect(signer);
 	try {
-		await contract.liquidate(
-			collateral,
-			user,
+		const tx = await contract.liquidate(
+			collateralAddress,
+			userAddress,
 			ethers.utils.parseEther(debtToCover),
-			{ from: operatorAddress }
+			{
+				from: liquidatorAddress,
+			}
 		);
+		await tx.wait();
 		console.log('Liquidation successful');
 	} catch (error) {
 		console.error('Error during liquidation:', error);
@@ -170,18 +171,38 @@ export const liquidate = async (
 	}
 };
 
-export const getMscTotalSupply = async () => {
+export const getTotalSupply = async () => {
 	const provider = getProviderOrSigner();
+	// Make sure to use the correct key here as defined in your contractAddresses object
 	const mscContract = new ethers.Contract(
-		contractAddresses.msc,
+		contractAddresses.metanaStableCoin, // This should match the key in your contractAddresses object
 		MetanaStableCoinABI,
 		provider
 	);
 	try {
 		const totalSupply = await mscContract.totalSupply();
-		return ethers.utils.formatUnits(totalSupply, 'ether');
+		return ethers.utils.formatEther(totalSupply);
 	} catch (error) {
-		console.error('Error fetching MSC total supply:', error);
+		console.error('Error fetching total supply:', error);
+		throw error;
+	}
+};
+
+export const getCollateralBalanceOfUser = async (userAddress, tokenAddress) => {
+	const provider = getProviderOrSigner();
+	const contract = new ethers.Contract(
+		contractAddresses.mscEngine,
+		MSCEngineABI,
+		provider
+	);
+	try {
+		const balance = await contract.getCollateralBalanceOfUser(
+			userAddress,
+			tokenAddress
+		);
+		return balance;
+	} catch (error) {
+		console.error('Error fetching collateral balance:', error);
 		throw error;
 	}
 };

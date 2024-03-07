@@ -6,10 +6,11 @@
  * @param {boolean} [noDecimals=false] - Whether to display decimals.
  * @returns {string} - The formatted number as a string.
  */
-export const formatNumber = (number, noDecimals = false) => {
+
+export const formatNumber = (number, noDecimals = false, decimals = 2) => {
 	const options = {
-		minimumFractionDigits: noDecimals ? 0 : 2,
-		maximumFractionDigits: noDecimals ? 0 : 2,
+		minimumFractionDigits: noDecimals ? 0 : decimals,
+		maximumFractionDigits: noDecimals ? 0 : decimals,
 	};
 	return Number(number).toLocaleString(undefined, options);
 };

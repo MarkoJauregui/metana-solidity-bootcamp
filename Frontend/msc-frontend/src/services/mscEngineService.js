@@ -1,5 +1,10 @@
 import { ethers } from 'ethers';
-import { MSCEngineABI, WETHABI, contractAddresses } from '../config/contracts';
+import {
+	MSCEngineABI,
+	MetanaStableCoinABI,
+	WETHABI,
+	contractAddresses,
+} from '../config/contracts';
 
 // Helper function to get a provider or signer
 const getProviderOrSigner = (needSigner = false) => {
@@ -14,6 +19,15 @@ const mscEngineContract = () => {
 		contractAddresses.mscEngine,
 		MSCEngineABI,
 		provider
+	);
+};
+
+// Initialize the MetanaStableCoin contract
+const metanaStableCoinContract = (signerOrProvider) => {
+	return new ethers.Contract(
+		contractAddresses.metanaStableCoin,
+		MetanaStableCoinABI,
+		signerOrProvider
 	);
 };
 
@@ -59,4 +73,65 @@ export const getUsdValue = async (tokenAddress, amountInWei) => {
 		console.error('Error fetching USD value:', error);
 		throw error;
 	}
+};
+
+// Assuming MSCEngineABI and contractAddresses are already imported
+
+export const getAccountInformation = async (userAddress) => {
+	const provider = getProviderOrSigner();
+	const contract = new ethers.Contract(
+		contractAddresses.mscEngine,
+		MSCEngineABI,
+		provider
+	);
+	try {
+		const [totalMscMinted, collateralValueInUsd] =
+			await contract.getAccountInformation(userAddress);
+		return {
+			totalMscMinted: ethers.utils.formatUnits(totalMscMinted, 'ether'), // Adjust based on your token's decimals
+			collateralValueInUsd: ethers.utils.formatUnits(
+				collateralValueInUsd,
+				'ether'
+			), // Assuming USD value is also in wei format
+		};
+	} catch (error) {
+		console.error('Error fetching account information:', error);
+		throw error;
+	}
+};
+
+// Function to approve MSC
+export const approveMSC = async (amount, userAddress) => {
+	const signer = getProviderOrSigner(true);
+	const mscContract = metanaStableCoinContract(signer);
+	const amountToApprove = ethers.utils.parseEther(amount.toString());
+	const tx = await mscContract.approve(
+		contractAddresses.mscEngine,
+		amountToApprove
+	);
+	await tx.wait();
+	console.log('MSC approval successful');
+};
+
+// Function to redeem collateral and burn MSC
+export const redeemCollateralForMsc = async (
+	wethAmount,
+	mscAmount,
+	userAddress
+) => {
+	const signer = getProviderOrSigner(true);
+	const engineContract = new ethers.Contract(
+		contractAddresses.mscEngine,
+		MSCEngineABI,
+		signer
+	);
+	const wethAmountInWei = ethers.utils.parseEther(wethAmount.toString());
+	const mscAmountInWei = ethers.utils.parseEther(mscAmount.toString());
+	const tx = await engineContract.reedemCollateralForMsc(
+		contractAddresses.wETH,
+		wethAmountInWei,
+		mscAmountInWei
+	);
+	await tx.wait();
+	console.log('Collateral redeemed and MSC burned successfully');
 };

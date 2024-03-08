@@ -33,12 +33,11 @@ const WalletInfo = () => {
 
 	const fetchCollateralBalance = async (userAddress) => {
 		try {
-			const wethCollateralWei = await getCollateralBalanceOfUser(
+			const wethCollateral = await getCollateralBalanceOfUser(
 				userAddress,
 				contractAddresses.wETH
 			);
-			const wethCollateral = ethers.utils.formatEther(wethCollateralWei);
-			setCollateralInWeth(formatNumber(wethCollateral, false)); // Adjust decimal places as needed
+			setCollateralInWeth(formatNumber(wethCollateral, false)); // Keep decimals as needed
 		} catch (error) {
 			console.error('Failed to fetch WETH collateral balance:', error);
 		}

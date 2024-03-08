@@ -196,11 +196,12 @@ export const getCollateralBalanceOfUser = async (userAddress, tokenAddress) => {
 		provider
 	);
 	try {
-		const balance = await contract.getCollateralBalanceOfUser(
+		const balanceWei = await contract.getCollateralBalanceOfUser(
 			userAddress,
 			tokenAddress
 		);
-		return balance;
+		const balanceEther = ethers.utils.formatEther(balanceWei);
+		return balanceEther; // This returns the balance in Ether, not Wei
 	} catch (error) {
 		console.error('Error fetching collateral balance:', error);
 		throw error;

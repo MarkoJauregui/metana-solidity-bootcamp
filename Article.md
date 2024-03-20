@@ -122,3 +122,23 @@ This approach, while specific to the challenge, offers broader lessons in smart 
 ## Conclusion: Lessons Beyond the Challenge
 
 The Ethernaut Challenge 2, set against the backdrop of Solidity's evolution, provides a rich learning experience that extends beyond the specifics of the challenge. It emphasizes the importance of understanding the fundamentals of smart contract development, the implications of language updates, and the continuous need for diligence and best practices in the blockchain development space. As Solidity and the Ethereum ecosystem evolve, staying informed and engaged with these developments remains crucial for developers aspiring to build secure, efficient, and reliable smart contracts.
+
+## FAQs:
+
+**Q1: What is the Ethernaut Challenge 2 about?**  
+A1: The Ethernaut Challenge 2, known as "Fallout," is a smart contract puzzle that involves exploiting a vulnerability due to an incorrectly named constructor function. Participants are tasked with claiming ownership of the contract by calling this misnamed function.
+
+**Q2: Why does the misnamed constructor in the Fallout contract pose a vulnerability?**  
+A2: In Solidity, constructors are meant to be called once upon contract deployment to initialize the contract's state. The Fallout contract's constructor was incorrectly named, making it a regular function callable by anyone. This allows an attacker to claim ownership of the contract by calling the misnamed function.
+
+**Q3: How did Solidity's approach to constructors evolve over time?**  
+A3: Initially, Solidity used a naming convention for constructors where the constructor function had the same name as the contract. This changed with Solidity 0.4.22, which introduced the `constructor` keyword, making contract initialization clearer and less prone to errors related to contract renaming.
+
+**Q4: What are the current best practices for defining constructors in Solidity?**  
+A4: As of the latest Solidity versions, the best practice is to use the `constructor` keyword without visibility specifiers. This approach is more secure and intuitive, eliminating the risks associated with the old naming convention and making the code more readable.
+
+**Q5: Can constructors have visibility specifiers in Solidity?**  
+A5: Initially, constructors could have visibility specifiers like `public` or `internal`. However, with the introduction of the `constructor` keyword and subsequent Solidity versions, setting visibility for constructors became unnecessary and is now disallowed. Constructors are implicitly internal and are called only once upon contract creation.
+
+**Q6: Why is understanding the evolution of Solidity important for developers?**  
+A6: Keeping up with Solidity's evolution helps developers write safer, more efficient, and up-to-date code. Understanding changes, such as the transition to the `constructor` keyword, allows developers to avoid common pitfalls and vulnerabilities in smart contract development.
